@@ -12,9 +12,14 @@ With Praat, you can easily create dialogue scenes.
 Version History
 ---------------
 
-#### Version 0.01 (2023/04/13) - Current version  
+#### Version 0.01 (2023/04/13)
 
 * Initial release
+
+#### Version 0.02 (2023/04/14) - Current version  
+
+* Ended flag added
+* Supported over 3 lines
 
 License
 -------

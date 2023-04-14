@@ -18,7 +18,7 @@ praat.textFGlineh = 0; praat.textMaxWidth = 0; praat.textMaxLines = 0
 praat.nameBGcolor, praat.nameLINEcolor, praat.nameLINEwidth = {0, 0, 0, 0.8}, {1, 1, 1}, 2
 praat.nameFGlt = nil; praat.nameFGcolor = {1, 1, 1}; praat.nameFGfont = nil
 praat.name = "";
-praat.state = 0 -- 0:Waiting inputs 1:Showing 2:Waiting reset
+praat.state = 0 -- 0:Waiting inputs 1:Showing 2:Waiting reset 3:Ended
 praat.waitCursor = nil
 praat.wcAt, praat.wcInterval, praat.wcWidth, praat.wcAnidir, praat.wcXY = 0, 0.05, 16, true, {784, 584}
 
@@ -36,6 +36,10 @@ end
 
 praat.setInterval = function(praat, interval)
   praat.interval = interval
+end
+
+praat.resetState = function(praat)
+  praat.state = 0
 end
 
 praat.setTextBG = function(praat, textBGarea, textBGcolor, textLINEcolor, textLINEwidth)
@@ -99,6 +103,7 @@ praat.setNameFG = function(praat, nameFGlt, nameFGcolor, nameFGfont)
 end
 
 praat.addline = function(praat, name, line, reset)
+  --print("added:"..name..":"..line)
   local newline = {}
   newline.reset = reset
   newline.chars = {}
@@ -113,16 +118,8 @@ praat.addline = function(praat, name, line, reset)
   --  print(newline.chars[i])
   --end
   table.insert(praat.table,newline)
-end
-
-praat.goNextDialogue = function(praat)
-  if (praat.table[1]["reset"] and (praat.state == 2)) then
-    praat.name = ""
-    praat.lines = {}
-    praat.nowLine = 1
-    praat.table[1] = nil
-    praat:newLine(praat)
-  end
+  --print("tableno:"..#(praat.table))
+  --print(praat.table[#(praat.table)]["chars"][1])
 end
 
 praat.setState = function(praat, state)
@@ -133,13 +130,39 @@ praat.setState = function(praat, state)
   end
 end
 
+praat.goNextDialogue = function(praat)
+  --for tmpI=1, #(praat.table) do
+  --  if (praat.table[tmpI]) then
+  --    if (praat.table[tmpI]["chars"]) then
+  --      if (praat.table[tmpI]["chars"][1]) then
+  --        print("["..tmpI.."]>"..praat.table[tmpI]["chars"][1])
+  --      end
+  --    end
+  --  end
+  --end
+  if praat.table[1] then
+    if (praat.table[1]["reset"] and (praat.state == 2)) then
+      praat.name = ""
+      praat.lines = {}
+      praat.nowLine = 1
+      praat.table[1] = nil
+      praat:newLine(praat)
+    end
+  else
+    --print("none")
+  end
+end
+
 praat.newLine = function(praat)
   --print("tableno:"..#(praat.table))
   if (#(praat.table)>1) then
-    for tmpI=#(praat.table),2 do
+    for tmpI=2,#(praat.table) do
       praat.table[tmpI-1] = praat.table[tmpI]
     end
     table.remove(praat.table, #(praat.table))
+  --end
+  --if (#(praat.table)>=1) then
+    --print(praat.table[1]["chars"][1])
     praat.nowLine = praat.nowLine + 1
     if (praat.nowLine > praat.textMaxLines) then
       for tmpI = praat.textMaxLines, 2, -1 do
@@ -148,12 +171,14 @@ praat.newLine = function(praat)
       praat.lines[praat.textMaxLines] = ""
       praat.nowLine = praat.textMaxLines
     end
-    if ((praat.name ~= praat.table[1]["name"]) and (praat.table[1]["name"] ~= nil)) then
-      praat.lines = {}
-      praat.nowLine = 1
+    if praat.table[1] then
+      if ((praat.name ~= praat.table[1]["name"]) and (praat.table[1]["name"] ~= nil)) then
+        praat.lines = {}
+        praat.nowLine = 1
+      end
     end
   else
-    praat:setState(0)
+    praat:setState(3)
   end
 end
 
