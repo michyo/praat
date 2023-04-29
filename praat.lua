@@ -105,6 +105,7 @@ end
 praat.addline = function(praat, name, line, reset)
   --print("added:"..name..":"..line)
   local newline = {}
+  newline.type = 0
   newline.reset = reset
   newline.chars = {}
   newline.name = name
@@ -142,7 +143,7 @@ praat.goNextDialogue = function(praat)
   --end
   if praat.table[1] then
     if (praat.table[1]["reset"] and (praat.state == 2)) then
-      praat.name = ""
+      praat.name = nil
       praat.lines = {}
       praat.nowLine = 1
       praat.table[1] = nil
@@ -262,7 +263,7 @@ praat.draw = function(praat)
   local tmpColor = {love.graphics.getColor()}
   local tmpLineWidth = love.graphics.getLineWidth()
   local tmpFont = love.graphics.getFont()
-  if praat.nameBGarea then
+  if praat.nameBGarea and praat.name and praat.name~="" then
     love.graphics.setColor(praat.nameBGcolor)
     love.graphics.polygon("fill", praat.nameBGarea)
     love.graphics.setColor(praat.nameLINEcolor)
@@ -278,7 +279,9 @@ praat.draw = function(praat)
   end
   love.graphics.setFont(praat.nameFGfont)
   love.graphics.setColor(praat.nameFGcolor)
-  love.graphics.print(praat.name, praat.nameFGlt[1], praat.nameFGlt[2])
+  if praat.name then
+    love.graphics.print(praat.name, praat.nameFGlt[1], praat.nameFGlt[2])
+  end
   love.graphics.setFont(praat.textFGfont)
   love.graphics.setColor(praat.textFGcolor)
   for tmpI = 1,praat.textMaxLines do

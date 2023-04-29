@@ -16,13 +16,17 @@ Version History
 
 * Initial release
 
-#### Version 0.02 (2023/04/14) - Current version  
+#### Version 0.02 (2023/04/14)
 
 * Ended flag added
 * Supported over 3 lines
 
+#### Version 0.03 (2023/04/29) - Current version
+
+* Supported sentences with no name
+
 License
 -------
 
-Licensed under the MOUSEY license  
+Licensed under the MOUSEY license.  
 See LICENSE.txt for more information about the license.  
