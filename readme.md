@@ -21,9 +21,14 @@ Version History
 * Ended flag added
 * Supported over 3 lines
 
-#### Version 0.03 (2023/04/29) - Current version
+#### Version 0.03 (2023/04/29)
 
 * Supported sentences with no name
+
+#### Version 0.04 (2023/05/28) - Current version
+
+* Separated line feeds
+* ResetDialogue added
 
 License
 -------

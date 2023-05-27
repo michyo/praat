@@ -42,6 +42,13 @@ praat.resetState = function(praat)
   praat.state = 0
 end
 
+praat.resetDialogue = function(praat)
+  praat.state = 0
+  praat.table, praat.lines = {}, {}
+  praat.at, praat.interval, praat.nowLine = 0, 0.1, 1
+  praat.name = ""
+end
+
 praat.setTextBG = function(praat, textBGarea, textBGcolor, textLINEcolor, textLINEwidth)
   if textBGarea then
     praat.textBGarea = textBGarea
@@ -183,6 +190,20 @@ praat.newLine = function(praat)
   end
 end
 
+praat.lineFeed = function(praat)
+  praat.nowLine = praat.nowLine + 1
+  if (praat.nowLine > praat.textMaxLines) then
+    for tmpI = praat.textMaxLines, 2, -1 do
+      praat.lines[tmpI-1] = praat.lines[tmpI]
+    end
+    praat.lines[praat.textMaxLines] = ""
+    praat.nowLine = praat.textMaxLines
+  end
+  if not praat.lines[praat.nowLine] then
+    praat.lines[praat.nowLine] = ""
+  end
+end
+
 praat.update = function(praat, dt)
   praat.at = praat.at + dt
   if (praat.at >= praat.interval) then
@@ -197,31 +218,11 @@ praat.update = function(praat, dt)
           praat.lines[praat.nowLine] = ""
         end
         if (praat.table[1]["chars"][1] == "\n") then
-          praat.nowLine = praat.nowLine + 1
-          if (praat.nowLine > praat.textMaxLines) then
-            for tmpI = praat.textMaxLines, 2, -1 do
-              praat.lines[tmpI-1] = praat.lines[tmpI]
-            end
-            praat.lines[praat.textMaxLines] = ""
-            praat.nowLine = praat.textMaxLines
-          end
-          if not praat.lines[praat.nowLine] then
-            praat.lines[praat.nowLine] = ""
-          end
+          praat:lineFeed()
         else
           if (praat.textFGfont:getWidth(praat.lines[praat.nowLine] .. praat.table[1]["chars"][1]) > praat.textMaxWidth) then
             --print(praat.textMaxWidth)
-            praat.nowLine = praat.nowLine + 1
-            if (praat.nowLine > praat.textMaxLines) then
-              for tmpI = praat.textMaxLines, 2, -1 do
-                praat.lines[tmpI-1] = praat.lines[tmpI]
-              end
-              praat.lines[praat.textMaxLines] = ""
-              praat.nowLine = praat.textMaxLines
-            end
-            if not praat.lines[praat.nowLine] then
-              praat.lines[praat.nowLine] = ""
-            end
+            praat:lineFeed()
           end
           praat.lines[praat.nowLine] = praat.lines[praat.nowLine] .. praat.table[1]["chars"][1]
         end
@@ -263,26 +264,26 @@ praat.draw = function(praat)
   local tmpColor = {love.graphics.getColor()}
   local tmpLineWidth = love.graphics.getLineWidth()
   local tmpFont = love.graphics.getFont()
-  if praat.nameBGarea and praat.name and praat.name~="" then
+  if praat.nameBGarea and praat.name and praat.name~="" then -- Draw name BG
     love.graphics.setColor(praat.nameBGcolor)
     love.graphics.polygon("fill", praat.nameBGarea)
     love.graphics.setColor(praat.nameLINEcolor)
     love.graphics.setLineWidth(praat.nameLINEwidth)
     love.graphics.polygon("line", praat.nameBGarea)
   end
-  if praat.textBGarea then
+  if praat.textBGarea then -- Draw text BG
     love.graphics.setColor(praat.textBGcolor)
     love.graphics.polygon("fill", praat.textBGarea)
     love.graphics.setColor(praat.textLINEcolor)
     love.graphics.setLineWidth(praat.textLINEwidth)
     love.graphics.polygon("line", praat.textBGarea)
   end
-  love.graphics.setFont(praat.nameFGfont)
+  love.graphics.setFont(praat.nameFGfont) -- Draw name
   love.graphics.setColor(praat.nameFGcolor)
   if praat.name then
     love.graphics.print(praat.name, praat.nameFGlt[1], praat.nameFGlt[2])
   end
-  love.graphics.setFont(praat.textFGfont)
+  love.graphics.setFont(praat.textFGfont) -- Draw text
   love.graphics.setColor(praat.textFGcolor)
   for tmpI = 1,praat.textMaxLines do
     if praat.lines[tmpI] then
